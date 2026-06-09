@@ -28,8 +28,7 @@ export function Landing() {
   if (user) return <Navigate to="/dashboard" replace />;
 
   return (
-    <div className="min-h-svh relative overflow-hidden flex items-center justify-center py-10 px-5"
-      style={{ background: 'linear-gradient(160deg, #f0f9f4 0%, #e8f5ed 40%, #fef9ee 100%)' }}>
+    <div className="min-h-svh relative overflow-hidden flex items-center justify-center py-10 px-5">
 
       {/* Decorative blobs */}
       <div className="absolute pointer-events-none" style={{
@@ -74,8 +73,8 @@ export function Landing() {
           {/* Logo lockup */}
           <div className="inline-flex items-center gap-3 mb-8 animate-in">
             <div className="relative">
-              <div className="w-11 h-11 rounded-2xl flex items-center justify-center shadow-lg"
-                style={{ background: 'var(--gradient-brand)', boxShadow: '0 8px 24px var(--accent-glow)' }}>
+              <div className="w-11 h-11 rounded-2xl flex items-center justify-center shadow-lg border-2 border-white/80"
+                style={{ background: 'var(--gradient-brand)', boxShadow: '0 0 20px rgba(255,255,255,0.5), 0 8px 24px var(--accent-glow)' }}>
                 {/* Leaf icon */}
                 <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round"

@@ -63,9 +63,8 @@
   *, *::before, *::after { box-sizing: border-box; }
 
   body {
-    background: var(--bg-base);
-    background-image: var(--gradient-hero);
-    background-attachment: fixed;
+    background: url('/background.jpg') no-repeat center center fixed;
+    background-size: cover;
     color: var(--text-primary);
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -73,27 +72,13 @@
     min-height: 100svh;
   }
 
-  /* Decorative blobs (added via pseudo on body) */
+  /* Decorative blobs (removed since we have a real background image) */
   body::before {
-    content: '';
-    position: fixed;
-    width: 600px; height: 600px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(22,163,74,0.12) 0%, transparent 70%);
-    top: -200px; left: -150px;
-    pointer-events: none;
-    z-index: 0;
+    display: none;
   }
 
   body::after {
-    content: '';
-    position: fixed;
-    width: 500px; height: 500px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(245,158,11,0.08) 0%, transparent 70%);
-    bottom: -150px; right: -100px;
-    pointer-events: none;
-    z-index: 0;
+    display: none;
   }
 
   ::selection { background: rgba(22,163,74,0.2); color: var(--text-primary); }

@@ -54,9 +54,9 @@ export function useActivities(userId: string | undefined) {
         });
         if (res.ok) {
           const aiData = await res.json();
-          co2Kg = aiData.co2Kg;
-          comparison = aiData.comparison;
-          tip = aiData.tip;
+          co2Kg = Number(aiData.co2Kg) || co2Kg;
+          comparison = aiData.comparison || '';
+          tip = aiData.tip || '';
         }
       }
     } catch (e) {
