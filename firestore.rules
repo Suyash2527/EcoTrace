@@ -4,7 +4,7 @@ service cloud.firestore {
 
     // Helper: is the request from a verified, authenticated user?
     function isAuth() {
-      return request.auth != null && request.auth.token.email_verified == true;
+      return request.auth != null;
     }
 
     // Helper: is the requesting user the owner?
