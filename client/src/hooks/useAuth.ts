@@ -40,7 +40,8 @@ export function useAuth() {
   }, []);
 
   const signInWithGoogle = async () => {
-    await signInWithRedirect(auth, googleProvider);
+    const { signInWithPopup } = await import('firebase/auth');
+    await signInWithPopup(auth, googleProvider);
   };
 
   const signInWithEmail = async (email: string, password: string) => {

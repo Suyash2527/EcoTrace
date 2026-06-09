@@ -18,6 +18,18 @@ export function Settings() {
     dietType: profile?.dietType || 'omnivore'
   });
 
+  React.useEffect(() => {
+    if (profile) {
+      setFormData({
+        displayName: profile.displayName || '',
+        location: profile.location || '',
+        householdSize: profile.householdSize || 1,
+        carType: profile.carType || 'none',
+        dietType: profile.dietType || 'omnivore'
+      });
+    }
+  }, [profile]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const value = e.target.type === 'number' ? parseInt(e.target.value) || 1 : e.target.value;
     setFormData({ ...formData, [e.target.name]: value });
