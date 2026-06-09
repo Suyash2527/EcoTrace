@@ -9,8 +9,8 @@ export interface EmissionFactor {
 }
 
 const TRANSPORT: Record<string, EmissionFactor> = {
-  car_petrol:           { factor: 0.21,  unit: 'km',   label: 'Petrol Car',          icon: '🚗' },
-  car_diesel:           { factor: 0.17,  unit: 'km',   label: 'Diesel Car',          icon: '🚙' },
+  car_petrol:           { factor: 0.17,  unit: 'km',   label: 'Petrol Car',          icon: '🚗' },
+  car_diesel:           { factor: 0.21,  unit: 'km',   label: 'Diesel Car',          icon: '🚙' },
   car_electric:         { factor: 0.05,  unit: 'km',   label: 'Electric Car',        icon: '⚡' },
   car_hybrid:           { factor: 0.11,  unit: 'km',   label: 'Hybrid Car',          icon: '🔋' },
   bus:                  { factor: 0.089, unit: 'km',   label: 'Bus',                 icon: '🚌' },

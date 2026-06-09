@@ -11,6 +11,8 @@ import { healthRouter } from './routes/health';
 const app = express();
 const PORT = process.env.PORT ?? 8080;
 
+app.set('trust proxy', 1);
+
 // Helmet: sets 13 security headers including CSP, HSTS, XSS protection
 app.use(helmet({
   contentSecurityPolicy: {

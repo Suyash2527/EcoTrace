@@ -121,8 +121,11 @@ export async function predictActivityImpact(
 User's average activity emits ${avgUserCO2.toFixed(2)}kg CO2.
 Respond with ONLY JSON: {"co2Kg": number, "comparison": "one sentence comparing to typical", "tip": "one actionable reduction tip"}`;
   
-  const result = await model.generateContent(prompt);
-  const text = result.response.text().replace(/```json|```/g, '').trim();
+  const result = await model.generateContent({
+    contents: [{ role: 'user', parts: [{ text: prompt }] }],
+    generationConfig: { responseMimeType: "application/json" }
+  });
+  const text = result.response.text().trim();
   return JSON.parse(text);
 }
 
