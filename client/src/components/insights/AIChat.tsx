@@ -107,27 +107,37 @@ export function AIChat() {
   ];
 
   return (
-    <Card className="flex flex-col h-[600px] p-0 overflow-hidden">
-      <div className="bg-forest-900/80 p-4 border-b border-forest-400/20 flex items-center">
-        <div className="w-10 h-10 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl mr-3">
-          🌱
+    <div className="glass-panel flex flex-col h-[600px] p-0 overflow-hidden" style={{ borderRadius: 24 }}>
+      <div className="p-4 flex items-center border-b" style={{ borderColor: 'rgba(255,255,255,0.05)', background: 'rgba(0,0,0,0.1)' }}>
+        <div className="w-10 h-10 rounded-full flex items-center justify-center text-xl mr-3" style={{ background: 'var(--gradient-brand)', boxShadow: '0 4px 12px var(--accent-glow)' }}>
+          <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 3C12 3 19 6.5 19 13.5C19 18 16 21 12 21C12 21 12 16 8 12C5 9 6 4.5 12 3Z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 21V24" />
+          </svg>
         </div>
         <div>
-          <h3 className="font-medium text-cream-100">EcoTrace AI Coach</h3>
-          <p className="text-xs text-forest-300">Powered by Gemini</p>
+          <h3 className="font-bold text-gray-900" style={{ letterSpacing: '-0.02em' }}>EcoTrace AI Coach</h3>
+          <p className="text-xs text-gray-600 font-medium">Powered by Gemini</p>
         </div>
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 && (
           <div className="text-center mt-10">
-            <p className="text-forest-300 mb-6">Ask me anything about your carbon footprint!</p>
+            <p className="text-gray-600 font-medium mb-6">Ask me anything about your carbon footprint!</p>
             <div className="flex flex-wrap justify-center gap-2">
               {starterQuestions.map((q, i) => (
                 <button
                   key={i}
                   onClick={() => setInput(q)}
-                  className="bg-forest-800 text-sm text-cream-200 py-1.5 px-3 rounded-full border border-forest-600 hover:border-amber-400 hover:text-amber-400 transition-colors"
+                  className="text-sm py-1.5 px-3 rounded-full border transition-all"
+                  style={{ 
+                    borderColor: 'rgba(22,163,74,0.3)', 
+                    color: 'var(--text-primary)', 
+                    background: 'rgba(255,255,255,0.4)',
+                  }}
+                  onMouseOver={(e) => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.color = 'var(--accent)'; }}
+                  onMouseOut={(e) => { e.currentTarget.style.borderColor = 'rgba(22,163,74,0.3)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
                 >
                   {q}
                 </button>
@@ -138,40 +148,47 @@ export function AIChat() {
 
         {messages.map((msg) => (
           <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+            <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
               msg.role === 'user' 
-                ? 'bg-amber-400 text-forest-950 rounded-br-sm' 
-                : 'bg-forest-700 text-cream-100 rounded-bl-sm'
-            }`}>
+                ? 'rounded-br-sm shadow-sm' 
+                : 'rounded-bl-sm shadow-sm'
+            }`}
+            style={{
+              background: msg.role === 'user' ? 'var(--gradient-brand)' : 'rgba(255,255,255,0.7)',
+              color: msg.role === 'user' ? 'white' : 'var(--text-primary)',
+              border: msg.role === 'user' ? 'none' : '1px solid rgba(22,163,74,0.1)'
+            }}>
               {msg.content}
             </div>
           </div>
         ))}
         {isTyping && (
           <div className="flex justify-start">
-            <div className="bg-forest-700 text-cream-100 rounded-2xl rounded-bl-sm px-4 py-3 flex space-x-1 items-center">
-              <div className="w-2 h-2 bg-forest-400 rounded-full animate-bounce" />
-              <div className="w-2 h-2 bg-forest-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
-              <div className="w-2 h-2 bg-forest-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }} />
+            <div className="rounded-2xl rounded-bl-sm px-4 py-3 flex space-x-1.5 items-center shadow-sm"
+              style={{ background: 'rgba(255,255,255,0.7)', border: '1px solid rgba(22,163,74,0.1)' }}>
+              <div className="w-2 h-2 rounded-full animate-bounce" style={{ background: 'var(--accent)' }} />
+              <div className="w-2 h-2 rounded-full animate-bounce" style={{ animationDelay: '0.2s', background: 'var(--accent)' }} />
+              <div className="w-2 h-2 rounded-full animate-bounce" style={{ animationDelay: '0.4s', background: 'var(--accent)' }} />
             </div>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="p-4 bg-forest-900 border-t border-forest-400/20">
+      <div className="p-4 border-t" style={{ borderColor: 'rgba(22,163,74,0.1)', background: 'rgba(255,255,255,0.3)' }}>
         <form onSubmit={handleSubmit} className="flex items-center gap-2">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask about your footprint..."
-            className="flex-1 bg-forest-800 border border-forest-600 rounded-full py-2.5 px-4 text-cream-100 placeholder-forest-400 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+            className="input-field flex-1 !rounded-full !py-3"
           />
           <button
             type="submit"
             disabled={!input.trim() || isTyping}
-            className="w-11 h-11 rounded-full bg-amber-400 text-forest-950 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed hover:bg-amber-300 transition-colors shrink-0"
+            className="w-12 h-12 rounded-full flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md shrink-0"
+            style={{ background: 'var(--gradient-brand)', color: 'white' }}
           >
             <svg className="w-5 h-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -179,6 +196,6 @@ export function AIChat() {
           </button>
         </form>
       </div>
-    </Card>
+    </div>
   );
 }
