@@ -13,7 +13,10 @@ export function Analysis() {
   const [isExporting, setIsExporting] = useState(false);
 
   const runDeepAnalysis = async () => {
-    if (!user) return;
+    if (!user || !profile) {
+      setError("Please ensure your profile is completely loaded.");
+      return;
+    }
     setLoading(true);
     setError(null);
     try {

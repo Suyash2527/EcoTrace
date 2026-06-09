@@ -43,10 +43,10 @@ export function Insights() {
   };
 
   useEffect(() => {
-    if (user && activities.length >= 0) {
+    if (user && profile && activities.length >= 0) {
       fetchInsights();
     }
-  }, [user, activities.length]); // Re-fetch only when activities count changes
+  }, [user, profile, activities.length]); // Re-fetch only when profile loads or activities count changes
 
   return (
     <div className="p-6 md:p-10 max-w-7xl mx-auto space-y-8">

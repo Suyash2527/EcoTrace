@@ -9,7 +9,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
     return (
       <div
         ref={ref}
-        className={`bg-forest-800 border border-forest-400/20 rounded-[20px] p-6 transition-all duration-200 hover:border-forest-300/40 hover:-translate-y-px ${
+        className={`glass-card ${
           isInsight ? 'border-l-4 border-l-amber-400' : ''
         } ${className}`}
         {...props}

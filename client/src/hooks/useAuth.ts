@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import {
   signInWithRedirect, signInWithEmailAndPassword,
   createUserWithEmailAndPassword, signOut,
-  onAuthStateChanged, User
+  onAuthStateChanged, User, getRedirectResult
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db, googleProvider } from '../lib/firebase';
@@ -14,8 +14,11 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Safety timeout: if Firebase hangs (no env vars, network issue), unblock UI after 4s
+    // Safety timeout: if Firebase hangs, unblock UI
     const timeout = setTimeout(() => setLoading(false), 4000);
+
+    // Explicitly handle the redirect result in case the page reloaded from a Google Sign-In redirect
+    getRedirectResult(auth).catch(console.error);
 
     const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
       clearTimeout(timeout);
