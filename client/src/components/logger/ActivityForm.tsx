@@ -5,6 +5,7 @@ import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
 import { Category, Unit } from '../../types';
 import { formatCO2 } from '../../utils/formatters';
+import { getIcon } from '../../utils/icons';
 
 interface ActivityFormProps {
   onSubmit: (data: any) => Promise<void>;
@@ -43,7 +44,6 @@ export function ActivityForm({ onSubmit, isSubmitting }: ActivityFormProps) {
       notes
     });
 
-    // Reset form partially
     setQuantity('');
     setNotes('');
   };
@@ -56,28 +56,28 @@ export function ActivityForm({ onSubmit, isSubmitting }: ActivityFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-8 animate-in">
       <div>
-        <label className="block text-lg font-medium text-cream-100 mb-3">1. Select Category</label>
+        <label className="field-label text-lg mb-3">1. Select Category</label>
         <CategoryPicker selected={category} onSelect={(c) => { setCategory(c); setActivityType(''); }} />
       </div>
 
       {category && (
         <div className="space-y-6 animate-in">
           <div>
-            <label className="block text-lg font-medium text-cream-100 mb-3">2. What did you do?</label>
+            <label className="field-label text-lg mb-3">2. What did you do?</label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {Object.entries(EMISSION_FACTORS[category]).map(([key, factor]) => (
                 <button
                   key={key}
                   type="button"
                   onClick={() => setActivityType(key)}
-                  className={`flex items-center p-3 rounded-xl border text-left transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-400 ${
+                  className={`flex items-center p-3 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] ${
                     activityType === key 
-                      ? 'bg-forest-700 border-amber-400 text-cream-100 ring-1 ring-amber-400' 
-                      : 'bg-forest-900 border-forest-600 text-cream-200 hover:bg-forest-800'
+                      ? 'bg-[var(--accent-dim)] border-[var(--accent)] text-[var(--accent)] ring-1 ring-[var(--accent)]' 
+                      : 'bg-white/40 border-[var(--border-glass)] text-[var(--text-primary)] hover:bg-white/60 hover:shadow-sm'
                   }`}
                   aria-pressed={activityType === key}
                 >
-                  <span className="text-xl mr-2" aria-hidden="true">{factor.icon}</span>
+                  <span className="w-5 h-5 mr-2" aria-hidden="true">{getIcon(key, category)}</span>
                   <span className="text-sm font-medium">{factor.label}</span>
                 </button>
               ))}
@@ -112,31 +112,32 @@ export function ActivityForm({ onSubmit, isSubmitting }: ActivityFormProps) {
               </div>
 
               {predictedCO2 > 0 && (
-                <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 flex items-center justify-between">
+                <div className="bg-[var(--accent-dim)] border border-[var(--accent)] rounded-xl p-4 flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-amber-400/80 font-medium uppercase tracking-wider mb-1">Estimated Impact</p>
-                    <p className="text-forest-200 text-sm">This activity will add to your footprint.</p>
+                    <p className="text-sm text-[var(--accent)] font-semibold uppercase tracking-wider mb-1">Estimated Impact</p>
+                    <p className="text-[var(--text-muted)] text-sm">This activity will add to your footprint.</p>
                   </div>
                   <div className="text-right">
-                    <span className="text-2xl font-mono text-amber-400 font-bold">{formatCO2(predictedCO2).split(' ')[0]}</span>
-                    <span className="text-amber-400/80 ml-1 font-medium">{formatCO2(predictedCO2).split(' ')[1]}</span>
+                    <span className="text-2xl font-mono text-[var(--accent)] font-bold">{formatCO2(predictedCO2).split(' ')[0]}</span>
+                    <span className="text-[var(--accent)] ml-1 font-semibold">{formatCO2(predictedCO2).split(' ')[1]}</span>
                   </div>
                 </div>
               )}
 
               <div>
-                <label htmlFor="notes" className="block text-sm font-medium text-cream-200 mb-1">Notes (Optional)</label>
+                <label htmlFor="notes" className="field-label mb-1">Notes (Optional)</label>
                 <textarea
                   id="notes"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  className="w-full bg-forest-900 border border-forest-600 rounded-md py-2 px-3 text-cream-100 placeholder-forest-400 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                  className="input-field min-h-[80px]"
                   rows={2}
                   maxLength={200}
+                  placeholder="Any details to remember..."
                 />
               </div>
 
-              <div className="pt-4 border-t border-forest-400/20">
+              <div className="pt-4 border-t border-[var(--border-glass)]">
                 <Button type="submit" className="w-full" isLoading={isSubmitting} disabled={predictedCO2 === 0}>
                   Log Activity — {formatCO2(predictedCO2)}
                 </Button>

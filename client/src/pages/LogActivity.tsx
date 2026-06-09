@@ -53,13 +53,13 @@ export function LogActivity() {
       </div>
 
       <header>
-        <h1 className="text-3xl font-bold text-cream-100 mb-2">Log Activity</h1>
-        <p className="text-forest-300">Record your actions to calculate their footprint.</p>
+        <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-2">Log Activity</h1>
+        <p className="text-[var(--text-muted)]">Record your actions to calculate their footprint.</p>
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
         <div className="lg:col-span-3">
-          <div className="bg-forest-800 border border-forest-400/20 rounded-[20px] p-6 sm:p-8">
+          <div className="glass-card p-6 sm:p-8">
             <ActivityForm onSubmit={handleSubmit} isSubmitting={isSubmitting} />
           </div>
         </div>

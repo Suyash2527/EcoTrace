@@ -1,17 +1,18 @@
 import React from 'react';
 import { Category } from '../../types';
+import { CategoryIcons } from '../../utils/icons';
 
 interface CategoryPickerProps {
   selected: Category | null;
   onSelect: (category: Category) => void;
 }
 
-const categories: { id: Category; label: string; icon: string }[] = [
-  { id: 'transport', label: 'Transport', icon: '🚗' },
-  { id: 'food', label: 'Food', icon: '🍔' },
-  { id: 'energy', label: 'Energy', icon: '⚡' },
-  { id: 'shopping', label: 'Shopping', icon: '🛍️' },
-  { id: 'travel', label: 'Travel', icon: '✈️' },
+const categories: { id: Category; label: string }[] = [
+  { id: 'transport', label: 'Transport' },
+  { id: 'food', label: 'Food' },
+  { id: 'energy', label: 'Energy' },
+  { id: 'shopping', label: 'Shopping' },
+  { id: 'travel', label: 'Travel' },
 ];
 
 export function CategoryPicker({ selected, onSelect }: CategoryPickerProps) {
@@ -22,14 +23,14 @@ export function CategoryPicker({ selected, onSelect }: CategoryPickerProps) {
           key={cat.id}
           type="button"
           onClick={() => onSelect(cat.id)}
-          className={`flex-shrink-0 flex flex-col items-center justify-center w-24 h-24 rounded-2xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-400 ${
+          className={`flex-shrink-0 flex flex-col items-center justify-center w-24 h-24 rounded-2xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent ${
             selected === cat.id 
-              ? 'bg-amber-400/10 border-amber-400 text-amber-400 scale-105' 
-              : 'bg-forest-800 border-forest-600 text-cream-200 hover:border-forest-400 hover:bg-forest-700'
+              ? 'bg-[var(--accent-dim)] border-[var(--accent)] text-[var(--accent)] scale-105 shadow-md' 
+              : 'glass-card text-[var(--text-primary)] hover:border-[var(--accent)] hover:shadow-md'
           }`}
           aria-pressed={selected === cat.id}
         >
-          <span className="text-3xl mb-2" aria-hidden="true">{cat.icon}</span>
+          <span className="w-8 h-8 mb-2" aria-hidden="true">{CategoryIcons[cat.id]}</span>
           <span className="text-sm font-medium">{cat.label}</span>
         </button>
       ))}

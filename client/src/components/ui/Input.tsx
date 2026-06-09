@@ -14,28 +14,26 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
     return (
       <div className="w-full">
-        <label htmlFor={generatedId} className="block text-sm font-medium text-cream-200 mb-1">
+        <label htmlFor={generatedId} className="field-label">
           {label}
         </label>
         <div className="relative">
           <input
             id={generatedId}
             ref={ref}
-            className={`w-full bg-forest-900 border ${
-              error ? 'border-red-500/50 focus:ring-red-500/50' : 'border-forest-600 focus:ring-amber-400 focus:border-amber-400'
-            } rounded-md py-2 px-3 text-cream-100 placeholder-forest-400 focus:outline-none focus:ring-2 focus:ring-offset-0 transition-all ${className}`}
+            className={`input-field ${error ? 'border-red-400 focus:ring-red-400 focus:border-red-400' : ''} ${className}`}
             aria-invalid={!!error}
             aria-describedby={`${error ? errorId : ''} ${helperText && !error ? helperId : ''}`.trim() || undefined}
             {...props}
           />
         </div>
         {error && (
-          <p id={errorId} className="mt-1.5 text-sm text-red-400" role="alert">
+          <p id={errorId} className="mt-1.5 text-sm text-red-500 font-medium" role="alert">
             {error}
           </p>
         )}
         {helperText && !error && (
-          <p id={helperId} className="mt-1.5 text-sm text-forest-300">
+          <p id={helperId} className="mt-1.5 text-sm" style={{ color: 'var(--text-muted)' }}>
             {helperText}
           </p>
         )}
