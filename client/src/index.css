@@ -1,0 +1,186 @@
+@import "tailwindcss";
+
+@config "./tailwind.config.ts";
+
+@layer base {
+  :root {
+    --bg-primary: #061610;       /* forest-900: page background */
+    --bg-surface: #0d2818;       /* forest-800: cards */
+    --bg-elevated: #153d24;      /* forest-700: modals, dropdowns */
+    --bg-subtle: #1e5530;        /* forest-600: hover states */
+    --text-primary: #f5f0e8;     /* cream-100 */
+    --text-secondary: #b5a890;   /* cream-400 */
+    --text-muted: #52b36a;       /* forest-300 */
+    --accent: #f59e0b;           /* amber-400 */
+    --accent-glow: rgba(245, 158, 11, 0.15);
+    --border: rgba(83, 179, 106, 0.2);
+    --border-accent: rgba(245, 158, 11, 0.4);
+    --success: #4ade80;
+    --danger: #f87171;
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: 20px;
+    --radius-xl: 28px;
+  }
+
+  body {
+    @apply bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans antialiased;
+    font-family: 'Sora', sans-serif;
+  }
+}
+
+@layer components {
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(56px, 8vw, 96px);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+  }
+
+  .hero-accent {
+    color: var(--accent);
+  }
+
+  .co2-display {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(48px, 6vw, 72px);
+    font-weight: 300;
+    color: var(--text-primary);
+    letter-spacing: -0.03em;
+  }
+
+  .co2-unit {
+    font-family: 'Sora', sans-serif;
+    font-size: 18px;
+    color: var(--text-secondary);
+    margin-left: 8px;
+  }
+
+  .card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    transition: border-color 200ms ease, transform 200ms ease;
+  }
+
+  .card:hover {
+    border-color: rgba(83, 179, 106, 0.4);
+    transform: translateY(-1px);
+  }
+
+  .card-insight {
+    border-left: 3px solid var(--accent);
+  }
+
+  .nav {
+    background: var(--bg-primary);
+    border-right: 1px solid var(--border);
+  }
+
+  .nav-item-active {
+    color: var(--accent);
+    position: relative;
+  }
+
+  .nav-item-active::before {
+    content: '';
+    position: absolute;
+    left: -1px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 20px;
+    background: var(--accent);
+    border-radius: 0 2px 2px 0;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #030d07;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-md);
+    padding: 12px 24px;
+    font-family: 'Sora', sans-serif;
+    transition: all 150ms ease;
+  }
+
+  .btn-primary:hover {
+    background: #fcd34d;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px var(--accent-glow);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 12px 24px;
+    transition: all 150ms ease;
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--text-muted);
+    background: var(--bg-elevated);
+  }
+
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      var(--bg-elevated) 0%,
+      var(--bg-subtle) 50%,
+      var(--bg-elevated) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: var(--radius-sm);
+  }
+
+  .skip-nav {
+    @apply absolute top-[-40px] left-0 bg-[var(--accent)] text-[#030d07] p-2 z-50 transition-all duration-300;
+  }
+
+  .skip-nav:focus {
+    @apply top-0;
+  }
+}
+
+@layer utilities {
+  .animate-in {
+    animation: fadeUp 0.4s ease forwards;
+  }
+  
+  .animate-in:nth-child(1) { animation-delay: 0ms; }
+  .animate-in:nth-child(2) { animation-delay: 80ms; }
+  .animate-in:nth-child(3) { animation-delay: 160ms; }
+  .animate-in:nth-child(4) { animation-delay: 240ms; }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes float {
+  0%   { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+  10%  { opacity: 0.3; }
+  90%  { opacity: 0.3; }
+  100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+}
+
+/* Reduced motion override */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

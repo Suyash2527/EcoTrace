@@ -1,0 +1,52 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper: is the request from a verified, authenticated user?
+    function isAuth() {
+      return request.auth != null && request.auth.token.email_verified == true;
+    }
+
+    // Helper: is the requesting user the owner?
+    function isOwner(uid) {
+      return isAuth() && request.auth.uid == uid;
+    }
+
+    // User profiles: users can only read/write their own
+    match /users/{uid} {
+      allow read, write: if isOwner(uid);
+    }
+
+    // Activities: strict per-user isolation
+    match /users/{uid}/activities/{activityId} {
+      allow read, list: if isOwner(uid);
+      allow create: if isOwner(uid)
+        && request.resource.data.userId == uid
+        && request.resource.data.co2Kg is number
+        && request.resource.data.co2Kg >= 0
+        && request.resource.data.quantity is number
+        && request.resource.data.quantity > 0
+        && request.resource.data.quantity <= 100000;
+      allow update: if isOwner(uid)
+        && request.resource.data.userId == uid;
+      allow delete: if isOwner(uid);
+    }
+
+    // Insights: per-user, read/write own only
+    match /users/{uid}/insights/{insightId} {
+      allow read, write: if isOwner(uid);
+    }
+
+    // Chat history: per-user
+    match /users/{uid}/chats/{chatId} {
+      allow read, write: if isOwner(uid);
+    }
+
+    // Leaderboard: all authenticated users can read, 
+    // only server (via Admin SDK) can write
+    match /leaderboard/{uid} {
+      allow read: if isAuth();
+      allow write: if false; // server-side only via Admin SDK
+    }
+  }
+}
