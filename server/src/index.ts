@@ -31,6 +31,7 @@ app.use(helmet({
     },
   },
   crossOriginEmbedderPolicy: false,
+  crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
 }));
 
 // CORS — restrict to own Cloud Run domain in production
