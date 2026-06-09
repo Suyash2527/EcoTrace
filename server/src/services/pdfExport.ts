@@ -3,11 +3,11 @@ import { PassThrough } from 'stream';
 import { getStorage } from 'firebase-admin/storage';
 import { Activity, UserProfile } from './gemini';
 
-export async function generateAndUploadPDF(
+export async function generatePDFBuffer(
   userId: string,
   profile: UserProfile,
   activities: Activity[]
-): Promise<string> {
+): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     try {
       const doc = new PDFDocument({ margin: 50 });
@@ -15,27 +15,8 @@ export async function generateAndUploadPDF(
       
       doc.on('data', (chunk) => chunks.push(chunk));
       doc.on('error', (err) => reject(err));
-      doc.on('end', async () => {
-        try {
-          const pdfBuffer = Buffer.concat(chunks);
-          
-          const bucket = getStorage().bucket(process.env.FIREBASE_STORAGE_BUCKET);
-          const filename = `exports/${userId}/ecotrace_report_${Date.now()}.pdf`;
-          const file = bucket.file(filename);
-          
-          await file.save(pdfBuffer, {
-            metadata: { contentType: 'application/pdf' }
-          });
-          
-          const [url] = await file.getSignedUrl({
-            action: 'read',
-            expires: Date.now() + 60 * 60 * 1000, // 1 hour
-          });
-          
-          resolve(url);
-        } catch (e) {
-          reject(e);
-        }
+      doc.on('end', () => {
+        resolve(Buffer.concat(chunks));
       });
       
       // Build the PDF content

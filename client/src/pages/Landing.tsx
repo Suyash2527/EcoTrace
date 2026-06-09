@@ -83,12 +83,12 @@ export function Landing() {
                 </svg>
               </div>
             </div>
-            <div>
-              <span className="font-black text-xl tracking-tight" style={{ color: 'var(--text-primary)' }}>EcoTrace</span>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                <div className="glow-dot" style={{ width: 6, height: 6 }} />
-                <span className="text-xs font-medium" style={{ color: 'var(--accent)' }}>AI-Powered</span>
-              </div>
+            <div className="flex flex-col text-left">
+              <span className="text-2xl font-black tracking-tight text-white">EcoTrace</span>
+              <span className="text-xs font-bold uppercase tracking-widest text-[var(--accent)] flex items-center gap-1.5 mt-0.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] animate-pulse" />
+                AI-Powered
+              </span>
             </div>
           </div>
 

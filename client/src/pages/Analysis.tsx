@@ -33,7 +33,7 @@ export function Analysis() {
       if (!response.ok) throw new Error('Failed to run analysis');
 
       const data = await response.json();
-      setAnalysis(data.analysis);
+      setAnalysis(data.result);
     } catch (err: any) {
       setError(err.message);
     } finally {

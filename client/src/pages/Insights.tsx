@@ -34,7 +34,7 @@ export function Insights() {
       }
 
       const data = await response.json();
-      setInsights(data.insights);
+      setInsights(data); // data is directly the array of insights
     } catch (err: any) {
       setError(err.message || 'Something went wrong');
     } finally {

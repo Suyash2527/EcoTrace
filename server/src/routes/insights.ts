@@ -7,7 +7,7 @@ import xss from 'xss'; // Using xss library to sanitize strings
 export const insightsRouter = Router();
 
 const insightRequestSchema = z.object({
-  activities: z.array(z.any()).max(100),
+  activities: z.array(z.any()).max(500),
   profile: z.object({
     location: z.string(),
     householdSize: z.number(),

@@ -8,7 +8,7 @@ export const analysisRouter = Router();
 
 const analysisRequestSchema = z.object({
   question: z.string().max(500).optional().default('Give me a deep analysis of my carbon footprint.'),
-  activities: z.array(z.any()).max(100),
+  activities: z.array(z.any()).max(500),
   profile: z.any(),
 });
 

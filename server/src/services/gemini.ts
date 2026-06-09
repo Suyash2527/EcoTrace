@@ -70,7 +70,7 @@ export async function generateDeepAnalysis(
   profile: Partial<UserProfile>,
   question: string
 ): Promise<string> {
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
   
   const systemContext = `You are EcoTrace's AI advisor, an expert in carbon footprint analysis. 
 The user has logged ${activities.length} activities. Their biggest category by CO2 is 
