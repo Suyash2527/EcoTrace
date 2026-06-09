@@ -24,8 +24,12 @@ export function LogActivity() {
   const handleSubmit = async (data: any) => {
     setIsSubmitting(true);
     try {
-      await addActivity(data);
-      addToast('Activity logged successfully!', 'success');
+      const result = await addActivity(data);
+      if (result && result.tip) {
+        addToast(`Logged! AI Tip: ${result.tip}`, 'success');
+      } else {
+        addToast('Activity logged successfully!', 'success');
+      }
     } catch (err) {
       addToast('Failed to log activity. Please try again.', 'error');
     } finally {

@@ -139,7 +139,7 @@ export function ActivityForm({ onSubmit, isSubmitting }: ActivityFormProps) {
 
               <div className="pt-4 border-t border-[var(--border-glass)]">
                 <Button type="submit" className="w-full" isLoading={isSubmitting} disabled={predictedCO2 === 0}>
-                  Log Activity — {formatCO2(predictedCO2)}
+                  {isSubmitting ? 'Calculating AI Footprint...' : `Log Activity — ${formatCO2(predictedCO2)}`}
                 </Button>
               </div>
             </div>

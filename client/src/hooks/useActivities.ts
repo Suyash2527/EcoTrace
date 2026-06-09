@@ -4,7 +4,7 @@ import {
   orderBy, limit, onSnapshot, writeBatch,
   serverTimestamp
 } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { db, auth } from '../lib/firebase';
 import { Activity, Category } from '../types';
 import { calculateCO2 } from '../utils/emissionFactors';
 
@@ -34,15 +34,44 @@ export function useActivities(userId: string | undefined) {
     data: Omit<Activity, 'id' | 'co2Kg' | 'createdAt' | 'userId'>
   ) => {
     if (!userId) throw new Error('No user');
-    const co2Kg = calculateCO2(data.category, data.activityType, data.quantity);
+    
+    // Fallback static calculation in case AI fails
+    let co2Kg = calculateCO2(data.category, data.activityType, data.quantity);
+    let comparison = '';
+    let tip = '';
+
+    try {
+      const token = await auth.currentUser?.getIdToken();
+      if (token) {
+        const res = await fetch('/api/analysis/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({
+            activityType: data.activityType,
+            quantity: data.quantity,
+            userHistory: activities.slice(0, 10), // Only send recent history
+          })
+        });
+        if (res.ok) {
+          const aiData = await res.json();
+          co2Kg = aiData.co2Kg;
+          comparison = aiData.comparison;
+          tip = aiData.tip;
+        }
+      }
+    } catch (e) {
+      console.error('AI prediction failed, falling back to static calculation', e);
+    }
+
     await addDoc(collection(db, 'users', userId, 'activities'), {
       ...data,
       userId,
       co2Kg,
       createdAt: serverTimestamp(),
     });
-    return co2Kg;
-  }, [userId]);
+    
+    return { co2Kg, comparison, tip };
+  }, [userId, activities]);
 
   const deleteActivity = useCallback(async (activityId: string) => {
     if (!userId) return;

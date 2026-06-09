@@ -26,3 +26,24 @@ analysisRouter.post('/analysis/deep', requireAuth, async (req: Request, res: Res
     return res.status(400).json({ error: 'Failed to generate analysis' });
   }
 });
+const predictRequestSchema = z.object({
+  activityType: z.string().min(1).max(100),
+  quantity: z.number().positive(),
+  userHistory: z.array(z.any()).max(100).default([]),
+});
+
+analysisRouter.post('/analysis/predict', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const body = predictRequestSchema.parse(req.body);
+    const { predictActivityImpact } = await import('../services/gemini');
+    const result = await predictActivityImpact(
+      xss(body.activityType),
+      body.quantity,
+      body.userHistory as Activity[]
+    );
+    return res.json(result);
+  } catch (error) {
+    console.error(error);
+    return res.status(400).json({ error: 'Failed to predict activity impact' });
+  }
+});
