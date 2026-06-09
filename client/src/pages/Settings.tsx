@@ -30,6 +30,7 @@ export function Settings() {
         ...formData,
         carType: formData.carType as any,
         dietType: formData.dietType as any,
+        onboardingComplete: true
       });
       setToast({ message: 'Profile updated successfully', type: 'success' });
     } catch (err) {
@@ -54,45 +55,37 @@ export function Settings() {
 
       <header className="mb-8 flex justify-between items-end">
         <div>
-          <h1 className="text-3xl font-bold text-cream-100 mb-2">Settings</h1>
-          <p className="text-forest-300">Manage your profile and preferences.</p>
+          <h1 className="text-3xl font-bold mb-2 text-gray-900">Settings</h1>
+          <p className="text-gray-600">Manage your profile and preferences.</p>
         </div>
-        <Button variant="danger" onClick={logout}>Sign Out</Button>
+        <button className="btn btn-danger" onClick={logout}>Sign Out</button>
       </header>
 
-      <Card>
-        <h3 className="text-lg font-medium text-cream-100 mb-6">Profile Settings</h3>
+      <div className="glass-panel p-8 rounded-3xl" style={{ borderRadius: 28 }}>
+        <h3 className="text-lg font-bold mb-6 text-gray-900">Profile Settings</h3>
         
         <div className="space-y-6">
-          <Input
-            name="displayName"
-            label="Display Name"
-            value={formData.displayName}
-            onChange={handleChange}
-          />
-          <Input
-            name="location"
-            label="Location"
-            value={formData.location}
-            onChange={handleChange}
-          />
-          <Input
-            name="householdSize"
-            type="number"
-            label="Household Size"
-            min="1"
-            value={formData.householdSize}
-            onChange={handleChange}
-          />
+          <div>
+            <label className="field-label">Display Name</label>
+            <input className="input-field" name="displayName" value={formData.displayName} onChange={handleChange} />
+          </div>
+          <div>
+            <label className="field-label">Location</label>
+            <input className="input-field" name="location" value={formData.location} onChange={handleChange} />
+          </div>
+          <div>
+            <label className="field-label">Household Size</label>
+            <input className="input-field" type="number" min="1" name="householdSize" value={formData.householdSize} onChange={handleChange} />
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-cream-200 mb-1">Primary Transport</label>
+              <label className="field-label">Primary Transport</label>
               <select
                 name="carType"
                 value={formData.carType}
                 onChange={handleChange}
-                className="w-full bg-forest-900 border border-forest-600 rounded-md py-2 px-3 text-cream-100 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                className="input-field"
               >
                 <option value="none">No Car / Public Transit</option>
                 <option value="electric">Electric Vehicle</option>
@@ -103,12 +96,12 @@ export function Settings() {
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-cream-200 mb-1">Diet Type</label>
+              <label className="field-label">Diet Type</label>
               <select
                 name="dietType"
                 value={formData.dietType}
                 onChange={handleChange}
-                className="w-full bg-forest-900 border border-forest-600 rounded-md py-2 px-3 text-cream-100 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                className="input-field"
               >
                 <option value="vegan">Vegan</option>
                 <option value="vegetarian">Vegetarian</option>
@@ -118,13 +111,13 @@ export function Settings() {
             </div>
           </div>
 
-          <div className="pt-6 border-t border-forest-400/20 flex justify-end">
-            <Button onClick={handleSave} isLoading={loading}>
-              Save Changes
-            </Button>
+          <div className="pt-6 border-t flex justify-end" style={{ borderColor: 'rgba(22,163,74,0.1)' }}>
+            <button className="btn btn-primary" onClick={handleSave} disabled={loading}>
+              {loading ? 'Saving...' : 'Save Changes'}
+            </button>
           </div>
         </div>
-      </Card>
+      </div>
     </div>
   );
 }
