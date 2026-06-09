@@ -14,20 +14,26 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Safety timeout: if Firebase hangs (no env vars, network issue), unblock UI after 4s
+    const timeout = setTimeout(() => setLoading(false), 4000);
+
     const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
+      clearTimeout(timeout);
       setUser(firebaseUser);
       if (firebaseUser) {
-        const docRef = doc(db, 'users', firebaseUser.uid);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setProfile(docSnap.data() as UserProfile);
-        }
+        try {
+          const docRef = doc(db, 'users', firebaseUser.uid);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            setProfile(docSnap.data() as UserProfile);
+          }
+        } catch { /* offline / rules */ }
       } else {
         setProfile(null);
       }
       setLoading(false);
     });
-    return unsub;
+    return () => { unsub(); clearTimeout(timeout); };
   }, []);
 
   const signInWithGoogle = async () => {
@@ -54,5 +60,5 @@ export function useAuth() {
     setProfile(merged as UserProfile);
   };
 
-  return { user, profile, loading, signInWithGoogle, signInWithEmail, signUpWithEmail, logout, updateProfile };
+  return { user, profile, loading, signInWithGoogle, signInWithEmail, signUpWithEmail, logout, signOut: logout, updateProfile };
 }
