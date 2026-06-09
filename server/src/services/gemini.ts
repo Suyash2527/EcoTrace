@@ -37,7 +37,7 @@ export async function generateInsights(
   activities: Activity[],
   profile: Partial<UserProfile>
 ): Promise<Insight[]> {
-  const model = genAI.getGenerativeModel({ model: 'gemini-3.5-flash' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
   
   const prompt = `You are an expert carbon footprint advisor. Analyze this user's activity data and generate exactly 5 personalized, actionable insights to reduce their carbon footprint.
 
@@ -70,7 +70,7 @@ export async function generateDeepAnalysis(
   profile: Partial<UserProfile>,
   question: string
 ): Promise<string> {
-  const model = genAI.getGenerativeModel({ model: 'gemini-3.1-pro-preview' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
   
   const systemContext = `You are EcoTrace's AI advisor, an expert in carbon footprint analysis. 
 The user has logged ${activities.length} activities. Their biggest category by CO2 is 
@@ -88,7 +88,7 @@ export async function* streamChatResponse(
   activities: Activity[],
   profile: Partial<UserProfile>
 ): AsyncGenerator<string> {
-  const model = genAI.getGenerativeModel({ model: 'gemini-3.5-flash' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
   
   const chat = model.startChat({
     history: history.map(h => ({
@@ -113,7 +113,7 @@ export async function predictActivityImpact(
   quantity: number,
   userHistory: Activity[]
 ): Promise<{ co2Kg: number; comparison: string; tip: string }> {
-  const model = genAI.getGenerativeModel({ model: 'gemini-3.5-flash' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
   
   const avgUserCO2 = sumCO2(userHistory) / Math.max(userHistory.length, 1);
   
