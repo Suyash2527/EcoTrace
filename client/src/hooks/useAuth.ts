@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import {
-  signInWithRedirect, signInWithEmailAndPassword,
+  signInWithEmailAndPassword,
   createUserWithEmailAndPassword, signOut,
-  onAuthStateChanged, User, getRedirectResult
+  onAuthStateChanged, User
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { auth, db, googleProvider } from '../lib/firebase';
+import { auth, db } from '../lib/firebase';
 import { UserProfile } from '../types';
 
 export function useAuth() {
@@ -16,9 +16,6 @@ export function useAuth() {
   useEffect(() => {
     // Safety timeout: if Firebase hangs, unblock UI
     const timeout = setTimeout(() => setLoading(false), 4000);
-
-    // Explicitly handle the redirect result in case the page reloaded from a Google Sign-In redirect
-    getRedirectResult(auth).catch(console.error);
 
     const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
       clearTimeout(timeout);
@@ -38,10 +35,6 @@ export function useAuth() {
     });
     return () => { unsub(); clearTimeout(timeout); };
   }, []);
-
-  const signInWithGoogle = async () => {
-    await signInWithRedirect(auth, googleProvider);
-  };
 
   const signInWithEmail = async (email: string, password: string) => {
     await signInWithEmailAndPassword(auth, email, password);
@@ -63,5 +56,5 @@ export function useAuth() {
     setProfile(merged as UserProfile);
   };
 
-  return { user, profile, loading, signInWithGoogle, signInWithEmail, signUpWithEmail, logout, signOut: logout, updateProfile };
+  return { user, profile, loading, signInWithEmail, signUpWithEmail, logout, signOut: logout, updateProfile };
 }

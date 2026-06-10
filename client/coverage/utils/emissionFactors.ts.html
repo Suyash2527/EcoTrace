@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">92.85% </span>
+                <span class="strong">93.33% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>13/14</span>
+                <span class='fraction'>14/15</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>11/11</span>
+                <span class='fraction'>12/12</span>
             </div>
         
             
@@ -124,7 +124,12 @@
 <a name='L59'></a><a href='#L59'>59</a>
 <a name='L60'></a><a href='#L60'>60</a>
 <a name='L61'></a><a href='#L61'>61</a>
-<a name='L62'></a><a href='#L62'>62</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -147,19 +152,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -168,10 +160,28 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -196,12 +206,13 @@ export interface EmissionFactor {
 }
 &nbsp;
 const TRANSPORT: Record&lt;string, EmissionFactor&gt; = {
-  car_petrol:           { factor: 0.21,  unit: 'km',   label: 'Petrol Car',          icon: '🚗' },
-  car_diesel:           { factor: 0.17,  unit: 'km',   label: 'Diesel Car',          icon: '🚙' },
+  car_petrol:           { factor: 0.17,  unit: 'km',   label: 'Petrol Car',          icon: '🚗' },
+  car_diesel:           { factor: 0.21,  unit: 'km',   label: 'Diesel Car',          icon: '🚙' },
   car_electric:         { factor: 0.05,  unit: 'km',   label: 'Electric Car',        icon: '⚡' },
+  car_hybrid:           { factor: 0.11,  unit: 'km',   label: 'Hybrid Car',          icon: '🔋' },
   bus:                  { factor: 0.089, unit: 'km',   label: 'Bus',                 icon: '🚌' },
   train:                { factor: 0.041, unit: 'km',   label: 'Train',               icon: '🚆' },
-  flight_domestic:      { factor: 0.255, unit: 'km',   label: 'Domestic Flight',     icon: '✈️' },
+  flight_short:         { factor: 0.255, unit: 'km',   label: 'Short Flight',        icon: '✈️' },
   flight_international: { factor: 0.195, unit: 'km',   label: 'International Flight',icon: '🌍' },
   motorcycle:           { factor: 0.114, unit: 'km',   label: 'Motorcycle',          icon: '🏍️' },
   bicycle:              { factor: 0,     unit: 'km',   label: 'Bicycle',             icon: '🚲' },
@@ -236,7 +247,11 @@ const SHOPPING: Record&lt;string, EmissionFactor&gt; = {
   delivery:    { factor: 0.5,   unit: 'count', label: 'Online Parcel', icon: '📦' },
 };
 &nbsp;
-export const EMISSION_FACTORS = { transport: TRANSPORT, food: FOOD, energy: ENERGY, shopping: SHOPPING };
+const TRAVEL: Record&lt;string, EmissionFactor&gt; = {
+  hotel_stay: { factor: 15.0, unit: 'count', label: 'Hotel Night', icon: '🏨' }
+};
+&nbsp;
+export const EMISSION_FACTORS = { transport: TRANSPORT, food: FOOD, energy: ENERGY, shopping: SHOPPING, travel: TRAVEL };
 &nbsp;
 export function calculateCO2(category: Category, activityType: string, quantity: number): number {
   if (quantity &lt;= 0) return 0;
@@ -253,7 +268,7 @@ export function calculateCO2(category: Category, activityType: string, quantity:
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-06-09T04:45:22.408Z
+                at 2026-06-10T03:30:40.232Z
             </div>
         <script src="../prettify.js"></script>
         <script>

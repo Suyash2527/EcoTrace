@@ -8,9 +8,8 @@ export function LoginForm() {
   const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState('');
-  const { signInWithEmail, signUpWithEmail, signInWithGoogle } = useAuth();
+  const { signInWithEmail, signUpWithEmail } = useAuth();
   const { announce } = useAnnouncer();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -24,25 +23,14 @@ export function LoginForm() {
         await signUpWithEmail(email, password);
         announce('Account created successfully');
       }
-    } catch (err: any) {
-      const raw = err.message ?? 'Authentication failed';
+    } catch (err: unknown) {
+      const e = err as Error;
+      const raw = e.message ?? 'Authentication failed';
       const clean = raw.replace('Firebase: ', '').replace(/ \(auth\/.*?\)\.?$/, '');
       setError(clean);
       announce(`Error: ${clean}`);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleGoogle = async () => {
-    setError(''); setGoogleLoading(true);
-    try {
-      await signInWithGoogle();
-      announce('Signed in with Google');
-    } catch {
-      setError('Google sign-in failed. Make sure pop-ups are allowed.');
-    } finally {
-      setGoogleLoading(false);
     }
   };
 
@@ -73,39 +61,6 @@ export function LoginForm() {
           </p>
         </div>
 
-        {/* ── Google Sign-In (premium style) ── */}
-        <button
-          id="google-signin-btn"
-          onClick={handleGoogle}
-          disabled={googleLoading || loading}
-          className="btn btn-google w-full py-3 mb-5"
-          style={{ borderRadius: 12 }}
-        >
-          {googleLoading ? (
-            <svg className="w-4 h-4 animate-spin text-gray-600" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-            </svg>
-          ) : (
-            /* Official Google "G" logo in correct colors */
-            <svg width="20" height="20" viewBox="0 0 48 48">
-              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-              <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-              <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-              <path fill="none" d="M0 0h48v48H0z"/>
-            </svg>
-          )}
-          <span style={{ color: '#3c4043', fontWeight: 500, fontSize: 14 }}>
-            {googleLoading ? 'Signing in…' : 'Continue with Google'}
-          </span>
-        </button>
-
-        {/* Divider */}
-        <div className="divider mb-5">
-          <span className="text-xs font-semibold px-1" style={{ color: 'var(--text-muted)' }}>or with email</span>
-        </div>
-
         {/* Email/password form */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
@@ -119,6 +74,8 @@ export function LoginForm() {
               onChange={e => setEmail(e.target.value)}
               required
               autoComplete="email"
+              aria-invalid={!!error}
+              aria-describedby={error ? 'auth-error' : undefined}
             />
           </div>
 
@@ -136,10 +93,12 @@ export function LoginForm() {
                 required
                 minLength={6}
                 autoComplete={isLogin ? 'current-password' : 'new-password'}
+                aria-invalid={!!error}
+                aria-describedby={error ? 'auth-error' : undefined}
               />
               <button
                 type="button"
-                className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors"
+                className="absolute right-1 top-1/2 -translate-y-1/2 transition-colors p-3 flex items-center justify-center min-w-[48px] min-h-[48px]"
                 style={{ color: 'var(--text-muted)' }}
                 onClick={() => setShowPw(v => !v)}
                 aria-label={showPw ? 'Hide password' : 'Show password'}
@@ -160,7 +119,7 @@ export function LoginForm() {
 
           {/* Error */}
           {error && (
-            <div className="flex items-start gap-2.5 p-3.5 rounded-xl text-sm"
+            <div id="auth-error" className="flex items-start gap-2.5 p-3.5 rounded-xl text-sm"
               style={{ background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.2)', color: '#dc2626' }}
               role="alert">
               <svg className="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -173,7 +132,7 @@ export function LoginForm() {
           <button
             id={isLogin ? 'login-submit' : 'signup-submit'}
             type="submit"
-            disabled={loading || googleLoading}
+            disabled={loading}
             className="btn btn-primary py-3.5 mt-1"
             style={{ fontSize: 15, borderRadius: 12 }}
           >

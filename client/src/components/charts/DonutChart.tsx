@@ -61,6 +61,7 @@ export function DonutChart({ data }: DonutChartProps) {
       
       <div className="relative w-64 h-64 mb-6">
         <svg viewBox="-100 -100 200 200" className="transform -rotate-90 w-full h-full">
+          <title>CO2 by Category Donut Chart</title>
           {segments.map((seg, i) => (
             <circle
               key={i}

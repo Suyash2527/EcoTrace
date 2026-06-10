@@ -32,7 +32,7 @@ export interface Insight {
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY ?? '');
 
-// Use gemini-2.5-flash as the fallback since older models are deprecated or quota exhausted
+// Use gemini-2.5-flash since the user is on the paid tier with ample credits
 const FLASH_MODEL = 'gemini-2.5-flash';
 const PRO_MODEL   = 'gemini-2.5-flash';
 
@@ -186,20 +186,11 @@ export async function* streamChatResponse(
   activities: Activity[],
   profile: Partial<UserProfile>
 ): AsyncGenerator<string> {
-  const model = genAI.getGenerativeModel({ model: FLASH_MODEL });
   const p = safeProfile(profile);
   const monthlyTotal = sumCO2(activities).toFixed(1);
   const topCat = findTopCategory(activities);
 
-  const chat = model.startChat({
-    history: history.map(h => ({
-      role: h.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: h.content }],
-    })),
-    systemInstruction: {
-      role: 'system',
-      parts: [{
-        text: `You are EcoTrace AI, a friendly and knowledgeable carbon footprint coach.
+  const systemInstructionStr = `You are EcoTrace AI, a friendly and knowledgeable carbon footprint coach.
 
 User: ${p.displayName}, ${p.location}, ${p.dietType} diet, drives ${p.carType}, household of ${p.householdSize}.
 This month: ${monthlyTotal}kg CO₂. Top source: ${topCat}.
@@ -212,9 +203,21 @@ Guidelines:
 - Use the user's actual data when relevant
 - Give concise responses (2-4 sentences unless they ask for more)
 - Back up suggestions with numbers from their data
-- If they have no data, give personalized advice based on their profile`
-      }]
-    },
+- If they have no data, give personalized advice based on their profile`;
+
+  const model = genAI.getGenerativeModel({ 
+    model: FLASH_MODEL,
+    systemInstruction: {
+      role: 'system',
+      parts: [{ text: systemInstructionStr }]
+    }
+  });
+
+  const chat = model.startChat({
+    history: history.map(h => ({
+      role: h.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: h.content }],
+    })),
   });
 
   const stream = await chat.sendMessageStream(message);
@@ -255,4 +258,50 @@ Return ONLY JSON (no markdown):
     // Fallback
     return { co2Kg: quantity * 0.1, comparison: 'Similar to average', tip: 'Consider lower-emission alternatives.' };
   }
+}
+
+// ── Annual Report Calculator ──────────────────────────────────────────────
+export async function generateAnnualReport(
+  activities: Activity[],
+  profile: Partial<UserProfile>
+): Promise<string> {
+  const model = genAI.getGenerativeModel({ model: PRO_MODEL });
+  const p = safeProfile(profile);
+  
+  // Aggregate data specifically for the year
+  const totalCo2 = activities.reduce((s, a) => s + a.co2Kg, 0).toFixed(1);
+  const byCat: Record<string, number> = {};
+  activities.forEach(a => { byCat[a.category] = (byCat[a.category] ?? 0) + a.co2Kg; });
+  const categoryBreakdown = Object.entries(byCat).map(([c, kg]) => `- **${c}**: ${kg.toFixed(1)}kg CO₂`).join('\n');
+
+  const systemContext = `You are EcoTrace's AI Sustainability Auditor. Generate a comprehensive Annual Carbon Footprint Report.
+USER: ${p.displayName}, Location: ${p.location}, Household: ${p.householdSize}, Diet: ${p.dietType}, Car: ${p.carType}.
+TOTAL RECORDED EMISSIONS THIS YEAR: ${totalCo2}kg CO₂.
+Total logged activities: ${activities.length}.
+
+CATEGORY BREAKDOWN:
+${categoryBreakdown}
+
+Generate a beautiful, engaging markdown report with the following structure:
+# 🌍 ${p.displayName}'s Annual EcoReport
+
+## 📊 Year in Review
+A paragraph summarizing their total impact, comparing ${totalCo2}kg to regional/global averages for their location (${p.location}).
+
+## 🏆 Top Achievements
+Identify 2 positive patterns in their profile or data (e.g., lower than average food emissions due to diet, or lots of logged eco-friendly actions). Make it encouraging.
+
+## ⚠️ Areas for Improvement
+Highlight the top 2 emission sources. Be specific with the numbers provided.
+
+## 🔮 Predictive Forecast
+Based on the user's current data and habits, visualize their current scenario and predict their total carbon footprint generation over the next 12 months if they maintain their current trajectory. Provide a concrete estimated number in kg CO₂. Use a simple markdown table or visual text representation to show the projected emissions per quarter or month.
+
+## 🎯 Next Year's Roadmap
+Provide exactly 3 high-impact, realistic goals for them to adopt next year based on their specific profile and highest emission categories, aiming to reduce the projected forecast.
+
+Use emojis, bold text, and standard markdown. Do not include any JSON or code blocks.`;
+
+  const result = await model.generateContent(systemContext);
+  return result.response.text();
 }

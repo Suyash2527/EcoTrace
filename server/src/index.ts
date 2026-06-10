@@ -8,6 +8,7 @@ import { analysisRouter } from './routes/analysis';
 import { exportRouter } from './routes/export';
 import { healthRouter } from './routes/health';
 import { leaderboardRouter } from './routes/leaderboard';
+import { reportRouter } from './routes/report';
 
 const app = express();
 const PORT = process.env.PORT ?? 8080;
@@ -32,6 +33,11 @@ app.use(helmet({
       frameSrc: ["'none'"],
       objectSrc: ["'none'"],
     },
+  },
+  hsts: {
+    maxAge: 31536000,
+    includeSubDomains: true,
+    preload: true,
   },
   crossOriginEmbedderPolicy: false,
   crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" },
@@ -67,6 +73,7 @@ app.use('/api', analysisRouter);
 app.use('/api', exportRouter);
 app.use('/api', healthRouter);
 app.use('/api', leaderboardRouter);
+app.use('/api', reportRouter);
 
 // Serve React build
 const clientDist = path.join(__dirname, '../../client/dist');

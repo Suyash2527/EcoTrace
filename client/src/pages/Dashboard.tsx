@@ -9,6 +9,8 @@ import { TrendLine } from '../components/charts/TrendLine';
 import { DonutChart } from '../components/charts/DonutChart';
 import { CategoryBreakdown } from '../components/dashboard/CategoryBreakdown';
 import { ProgressRing } from '../components/dashboard/ProgressRing';
+import { ComparisonChart } from '../components/charts/ComparisonChart';
+import { getCountryAverage } from '../utils/countryAverages';
 
 /* ── Animated Stat Card ── */
 function StatCard({ label, value, unit, icon, color, note }: {
@@ -164,6 +166,13 @@ export function Dashboard() {
   // Budget: global average is ~11kg CO₂/day → ~330/month; personal target 100kg
   const MONTHLY_BUDGET = 100;
 
+  const countryAvg = getCountryAverage(profile?.location);
+  const comparisonData = [
+    { label: 'You', value: monthTotal, color: '#10b981', subLabel: 'This month' },
+    { label: countryAvg.country, value: countryAvg.monthlyKg, color: '#3b82f6', subLabel: 'Avg month' },
+    { label: 'Global', value: 391, color: '#f59e0b', subLabel: 'Avg month' },
+  ];
+
   return (
     <div className="p-5 md:p-10 max-w-6xl mx-auto space-y-6 animate-in">
 
@@ -250,8 +259,9 @@ export function Dashboard() {
         <CategoryBreakdown data={byCategory} />
       </RevealSection>
 
-      {/* Donut only */}
-      <RevealSection delay={120} className="grid grid-cols-1 md:grid-cols-2 gap-5">
+      {/* Analytics Row 2 */}
+      <RevealSection delay={120} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <ComparisonChart data={comparisonData} />
         <DonutChart data={byCategory} />
         {/* Quick action card */}
         <div className="glass-card flex flex-col justify-between gap-4">

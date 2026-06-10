@@ -50,7 +50,7 @@ export function Modal({ isOpen, onClose, title, children, footer }: ModalProps) 
           </h2>
           <button
             onClick={onClose}
-            className="text-forest-300 hover:text-cream-100 transition-colors p-2"
+            className="text-forest-300 hover:text-cream-100 transition-colors p-3 min-w-[48px] min-h-[48px] flex items-center justify-center"
             aria-label="Close modal"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

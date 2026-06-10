@@ -39,6 +39,7 @@ export function TrendLine({ data }: TrendLineProps) {
       
       <div className="w-full overflow-x-auto hide-scrollbar">
         <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto min-w-[400px]">
+          <title>CO2 Emissions Trend Line Chart</title>
           <defs>
             <linearGradient id="trend-gradient" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.3" />

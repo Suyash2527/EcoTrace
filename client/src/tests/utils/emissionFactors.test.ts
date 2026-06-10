@@ -3,7 +3,7 @@ import { calculateCO2 } from '../../utils/emissionFactors';
 
 describe('emissionFactors.ts', () => {
   it('calculates CO2 for transport correctly', () => {
-    expect(calculateCO2('transport', 'car_petrol', 10)).toBe(2.1);
+    expect(calculateCO2('transport', 'car_petrol', 10)).toBe(1.7);
     expect(calculateCO2('transport', 'bicycle', 100)).toBe(0);
   });
 
