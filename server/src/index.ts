@@ -7,6 +7,7 @@ import { insightsRouter } from './routes/insights';
 import { analysisRouter } from './routes/analysis';
 import { exportRouter } from './routes/export';
 import { healthRouter } from './routes/health';
+import { leaderboardRouter } from './routes/leaderboard';
 
 const app = express();
 const PORT = process.env.PORT ?? 8080;
@@ -65,6 +66,7 @@ app.use('/api', insightsRouter);
 app.use('/api', analysisRouter);
 app.use('/api', exportRouter);
 app.use('/api', healthRouter);
+app.use('/api', leaderboardRouter);
 
 // Serve React build
 const clientDist = path.join(__dirname, '../../client/dist');

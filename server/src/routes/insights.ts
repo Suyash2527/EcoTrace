@@ -2,51 +2,48 @@ import { Router, Request, Response } from 'express';
 import { requireAuth } from '../middleware/firebaseAuth';
 import { generateInsights, streamChatResponse, predictActivityImpact, Activity, UserProfile } from '../services/gemini';
 import { z } from 'zod';
-import xss from 'xss'; // Using xss library to sanitize strings
+import xss from 'xss';
 
 export const insightsRouter = Router();
 
+// Lenient profile schema — all fields optional, server fills defaults
 const insightRequestSchema = z.object({
-  activities: z.array(z.any()).max(500),
-  profile: z.object({
-    location: z.string(),
-    householdSize: z.number(),
-    carType: z.string().optional(),
-    dietType: z.string(),
-  }),
+  activities: z.array(z.any()).max(500).default([]),
+  profile: z.any().optional(),
 });
 
 const chatRequestSchema = z.object({
-  message: z.string().max(500),
+  message: z.string().max(1000),
   history: z.array(z.object({
     role: z.string(),
     content: z.string(),
-  })).max(20),
-  activities: z.array(z.any()).max(50),
-  profile: z.any(),
+  })).max(20).default([]),
+  activities: z.array(z.any()).max(200).default([]),
+  profile: z.any().optional().default({}),
 });
 
 const predictRequestSchema = z.object({
   activityType: z.string(),
   quantity: z.number().positive(),
-  userHistory: z.array(z.any()).max(50),
+  userHistory: z.array(z.any()).max(50).default([]),
 });
 
 insightsRouter.post('/insights', requireAuth, async (req: Request, res: Response) => {
   try {
     const body = insightRequestSchema.parse(req.body);
-    const profile = {
-      location: xss(body.profile.location),
-      householdSize: body.profile.householdSize,
-      carType: xss(body.profile.carType || 'none'),
-      dietType: xss(body.profile.dietType),
-    } as Partial<UserProfile>;
-    
+    const profile: Partial<UserProfile> = {
+      location: xss(body.profile?.location || 'unknown'),
+      householdSize: body.profile?.householdSize || 1,
+      carType: xss(body.profile?.carType || 'none'),
+      dietType: xss(body.profile?.dietType || 'omnivore'),
+      displayName: xss((body.profile as any)?.displayName || 'User'),
+    };
+
     const insights = await generateInsights(body.activities as Activity[], profile);
     return res.json(insights);
-  } catch (error) {
-    console.error(error);
-    return res.status(400).json({ error: 'Failed to generate insights' });
+  } catch (error: any) {
+    console.error('[insights] error:', error?.message || error);
+    return res.status(500).json({ error: 'Failed to generate insights', detail: error?.message });
   }
 });
 
@@ -56,6 +53,7 @@ insightsRouter.post('/chat', requireAuth, async (req: Request, res: Response) =>
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
+    res.setHeader('X-Accel-Buffering', 'no'); // Disable nginx buffering on Cloud Run
 
     const stream = streamChatResponse(
       xss(body.message),
@@ -69,10 +67,10 @@ insightsRouter.post('/chat', requireAuth, async (req: Request, res: Response) =>
     }
     res.write('data: [DONE]\n\n');
     res.end();
-  } catch (error) {
-    console.error(error);
+  } catch (error: any) {
+    console.error('[chat] error:', error?.message || error);
     if (!res.headersSent) {
-      return res.status(400).json({ error: 'Chat failed' });
+      return res.status(500).json({ error: 'Chat failed', detail: error?.message });
     }
     res.end();
   }
@@ -87,8 +85,8 @@ insightsRouter.post('/predict', requireAuth, async (req: Request, res: Response)
       body.userHistory as Activity[]
     );
     return res.json(prediction);
-  } catch (error) {
-    console.error(error);
-    return res.status(400).json({ error: 'Failed to predict impact' });
+  } catch (error: any) {
+    console.error('[predict] error:', error?.message || error);
+    return res.status(500).json({ error: 'Failed to predict impact', detail: error?.message });
   }
 });

@@ -1,59 +1,118 @@
 import React from 'react';
 import { Insight } from '../../types';
-import { Card } from '../ui/Card';
-import { Badge } from '../ui/Badge';
-import { formatCO2, formatDate } from '../../utils/formatters';
+import { useScrollReveal } from '../../hooks/useScrollReveal';
+
+const CATEGORY_ICONS: Record<string, string> = {
+  transport: '🚗', food: '🥗', energy: '⚡', shopping: '🛍️', travel: '✈️',
+};
+
+const DIFFICULTY_CONFIG = {
+  easy:   { label: 'Easy win',      color: '#16a34a', bg: 'rgba(22,163,74,0.1)',  border: 'rgba(22,163,74,0.2)' },
+  medium: { label: 'Medium effort', color: '#d97706', bg: 'rgba(217,119,6,0.1)', border: 'rgba(217,119,6,0.2)' },
+  hard:   { label: 'Major change',  color: '#7c3aed', bg: 'rgba(124,58,237,0.1)', border: 'rgba(124,58,237,0.2)' },
+};
 
 interface InsightCardProps {
   insight: Insight;
+  delay?: number;
 }
 
-export function InsightCard({ insight }: InsightCardProps) {
-  const difficultyMap = {
-    easy: { label: 'Easy win', variant: 'success' as const },
-    medium: { label: 'Medium effort', variant: 'warning' as const },
-    hard: { label: 'Major change', variant: 'danger' as const },
-  };
-
-  const diff = difficultyMap[insight.difficulty];
+export function InsightCard({ insight, delay = 0 }: InsightCardProps) {
+  const { ref, visible } = useScrollReveal<HTMLDivElement>({ threshold: 0.1 });
+  const diff = DIFFICULTY_CONFIG[insight.difficulty] ?? DIFFICULTY_CONFIG.medium;
+  const catIcon = CATEGORY_ICONS[insight.category] ?? '🌱';
 
   return (
-    <Card isInsight className="flex flex-col h-full relative overflow-hidden animate-in group">
-      {/* Background glow effect on hover */}
-      <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      
-      <div className="relative z-10 flex flex-col h-full">
-        <div className="flex justify-between items-start mb-4">
-          <Badge variant={diff.variant}>{diff.label}</Badge>
-          <span className="text-xs text-forest-400">{formatDate(insight.generatedAt)}</span>
+    <div
+      ref={ref}
+      className="glass-card flex flex-col h-full group"
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible ? 'translateY(0)' : 'translateY(20px)',
+        transition: `opacity 500ms ease ${delay}ms, transform 500ms cubic-bezier(0.4,0,0.2,1) ${delay}ms`,
+      }}
+    >
+      {/* Top row: category icon + difficulty badge */}
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <div
+            className="w-9 h-9 rounded-xl flex items-center justify-center text-lg"
+            style={{ background: diff.bg }}
+          >
+            {catIcon}
+          </div>
+          <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
+            {insight.category}
+          </span>
         </div>
+        <span
+          className="text-xs font-bold px-2.5 py-1 rounded-full"
+          style={{ background: diff.bg, color: diff.color, border: `1px solid ${diff.border}` }}
+        >
+          {diff.label}
+        </span>
+      </div>
 
-        <h3 className="text-lg font-bold text-cream-100 mb-2">{insight.title}</h3>
-        <p className="text-sm text-forest-300 mb-4 flex-grow">{insight.description}</p>
+      {/* Title */}
+      <h3 className="text-base font-black mb-2 leading-snug"
+        style={{ color: 'var(--text-primary)', letterSpacing: '-0.015em' }}>
+        {insight.title}
+      </h3>
 
-        <div className="bg-forest-900/50 rounded-lg p-4 mb-4">
-          <ul className="space-y-2">
-            {insight.actionItems.map((item, i) => (
-              <li key={i} className="flex text-sm text-cream-200">
-                <span className="text-amber-400 mr-2 flex-shrink-0">•</span>
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+      {/* Description */}
+      <p className="text-sm leading-relaxed mb-4 flex-grow"
+        style={{ color: 'var(--text-secondary)' }}>
+        {insight.description}
+      </p>
 
-        <div className="mt-auto flex items-center justify-between border-t border-forest-400/10 pt-4">
-          <span className="text-sm font-medium text-forest-300">Potential saving</span>
-          <div className="text-right">
-            <span className="text-lg font-mono font-bold text-amber-400">
-              {formatCO2(insight.potentialSavingKg).split(' ')[0]}
-            </span>
-            <span className="text-amber-400/80 text-sm ml-1 font-medium">
-              {formatCO2(insight.potentialSavingKg).split(' ')[1]}/mo
+      {/* Action items */}
+      <div
+        className="rounded-xl p-3.5 mb-4 space-y-2"
+        style={{ background: 'rgba(22,163,74,0.05)', border: '1px solid rgba(22,163,74,0.1)' }}
+      >
+        <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: 'var(--text-muted)' }}>
+          Action steps
+        </p>
+        {insight.actionItems.map((item, i) => (
+          <div key={i} className="flex items-start gap-2.5">
+            <div
+              className="w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black text-white shrink-0 mt-0.5"
+              style={{ background: 'var(--gradient-brand)' }}
+            >
+              {i + 1}
+            </div>
+            <span className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+              {item}
             </span>
           </div>
+        ))}
+      </div>
+
+      {/* Footer: potential saving */}
+      <div
+        className="flex items-center justify-between pt-3.5 mt-auto border-t"
+        style={{ borderColor: 'rgba(22,163,74,0.1)' }}
+      >
+        <span className="text-xs font-medium" style={{ color: 'var(--text-muted)' }}>
+          Potential saving
+        </span>
+        <div className="flex items-end gap-1">
+          <span
+            className="text-lg font-black tabular-nums"
+            style={{
+              background: 'var(--gradient-brand)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}
+          >
+            {insight.potentialSavingKg.toFixed(1)}
+          </span>
+          <span className="text-xs font-medium mb-0.5" style={{ color: 'var(--text-muted)' }}>
+            kg CO₂/mo
+          </span>
         </div>
       </div>
-    </Card>
+    </div>
   );
 }

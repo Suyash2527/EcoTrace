@@ -1,6 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Placeholder for Activity and UserProfile types used by the server
 export interface Activity {
   id: string;
   userId: string;
@@ -33,106 +32,24 @@ export interface Insight {
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY ?? '');
 
-export async function generateInsights(
-  activities: Activity[],
-  profile: Partial<UserProfile>
-): Promise<Insight[]> {
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-  
-  const prompt = `You are an expert carbon footprint advisor. Analyze this user's activity data and generate exactly 5 personalized, actionable insights to reduce their carbon footprint.
+// Use gemini-2.5-flash as the fallback since older models are deprecated or quota exhausted
+const FLASH_MODEL = 'gemini-2.5-flash';
+const PRO_MODEL   = 'gemini-2.5-flash';
 
-User profile: location=${profile.location}, household=${profile.householdSize} people, diet=${profile.dietType}, car=${profile.carType}
-Activities (last 30 days): ${JSON.stringify(activities.slice(0, 50))}
-
-RESPOND ONLY WITH A VALID JSON ARRAY. No markdown. No explanation. No code fences.
-Each object must have exactly these fields:
-- id: string (uuid v4)
-- title: string (max 60 chars, compelling action-oriented)
-- description: string (1-2 sentences explaining the impact)
-- actionItems: string[] (exactly 3 specific, measurable steps)
-- category: "transport"|"food"|"energy"|"shopping"|"travel"
-- potentialSavingKg: number (realistic monthly CO2 saving in kg)
-- difficulty: "easy"|"medium"|"hard"
-- generatedAt: string (current ISO timestamp)
-
-Prioritize the highest-impact, most realistic changes for this specific user.`;
-
-  const result = await model.generateContent(prompt);
-  const text = result.response.text().replace(/```json|```/g, '').trim();
-  const parsed = JSON.parse(text);
-  
-  if (!Array.isArray(parsed)) throw new Error('Invalid AI response format');
-  return parsed.slice(0, 5);
-}
-
-export async function generateDeepAnalysis(
-  activities: Activity[],
-  profile: Partial<UserProfile>,
-  question: string
-): Promise<string> {
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
-  
-  const systemContext = `You are EcoTrace's AI advisor, an expert in carbon footprint analysis. 
-The user has logged ${activities.length} activities. Their biggest category by CO2 is 
-${findTopCategory(activities)}. Total CO2 this month: ${sumCO2(activities).toFixed(1)}kg.
-User location: ${profile.location}. Diet: ${profile.dietType}.
-Activities summary: ${JSON.stringify(activities.slice(0, 30))}`;
-
-  const result = await model.generateContent(`${systemContext}\n\nUser question: ${question}`);
-  return result.response.text();
-}
-
-export async function* streamChatResponse(
-  message: string,
-  history: Array<{role: string; content: string}>,
-  activities: Activity[],
-  profile: Partial<UserProfile>
-): AsyncGenerator<string> {
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-  
-  const chat = model.startChat({
-    history: history.map(h => ({
-      role: h.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: h.content }],
-    })),
-    systemInstruction: `You are EcoTrace, a friendly carbon footprint coach. 
-You have access to the user's carbon data. Be specific, encouraging, and practical.
-User's recent CO2: ${sumCO2(activities).toFixed(1)}kg this month.
-Top emission source: ${findTopCategory(activities)}.
-Give concise responses (2-4 sentences unless asked for more). Use data to back up suggestions.`,
-  });
-  
-  const stream = await chat.sendMessageStream(message);
-  for await (const chunk of stream.stream) {
-    yield chunk.text();
-  }
-}
-
-export async function predictActivityImpact(
-  activityType: string,
-  quantity: number,
-  userHistory: Activity[]
-): Promise<{ co2Kg: number; comparison: string; tip: string }> {
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-  
-  const avgUserCO2 = sumCO2(userHistory) / Math.max(userHistory.length, 1);
-  
-  const prompt = `For a carbon footprint tracker: activity "${activityType}" at quantity ${quantity}.
-User's average activity emits ${avgUserCO2.toFixed(2)}kg CO2.
-Respond with ONLY JSON: {"co2Kg": number, "comparison": "one sentence comparing to typical", "tip": "one actionable reduction tip"}`;
-  
-  const result = await model.generateContent({
-    contents: [{ role: 'user', parts: [{ text: prompt }] }],
-    generationConfig: { responseMimeType: "application/json" }
-  });
-  const text = result.response.text().trim();
-  return JSON.parse(text);
+function safeProfile(profile: Partial<UserProfile>) {
+  return {
+    location: profile.location || 'unknown',
+    householdSize: profile.householdSize || 1,
+    carType: profile.carType || 'none',
+    dietType: profile.dietType || 'omnivore',
+    displayName: profile.displayName || 'User',
+  };
 }
 
 function findTopCategory(activities: Activity[]): string {
   const totals: Record<string, number> = {};
   activities.forEach(a => { totals[a.category] = (totals[a.category] ?? 0) + a.co2Kg; });
-  return Object.entries(totals).sort((a, b) => b[1] - a[1])[0]?.[0] ?? 'unknown';
+  return Object.entries(totals).sort((a, b) => b[1] - a[1])[0]?.[0] ?? 'transport';
 }
 
 function sumCO2(activities: Activity[]): number {
@@ -141,4 +58,201 @@ function sumCO2(activities: Activity[]): number {
   return activities
     .filter(a => new Date(a.date) >= monthAgo)
     .reduce((s, a) => s + a.co2Kg, 0);
+}
+
+function buildActivitySummary(activities: Activity[]): string {
+  if (activities.length === 0) return 'No activities logged yet.';
+  
+  // Group by category and sum
+  const byCat: Record<string, number> = {};
+  activities.slice(0, 100).forEach(a => {
+    byCat[a.category] = (byCat[a.category] ?? 0) + a.co2Kg;
+  });
+  
+  const summary = Object.entries(byCat)
+    .sort((a, b) => b[1] - a[1])
+    .map(([cat, kg]) => `${cat}: ${kg.toFixed(1)}kg`)
+    .join(', ');
+  
+  const recent = activities.slice(0, 20).map(a =>
+    `${a.date} ${a.activityType} ${a.quantity}${a.unit} = ${a.co2Kg}kg CO₂`
+  ).join('\n');
+
+  return `Category totals: ${summary}\n\nRecent activities:\n${recent}`;
+}
+
+// ── Insights ──────────────────────────────────────────────────────────────
+export async function generateInsights(
+  activities: Activity[],
+  profile: Partial<UserProfile>
+): Promise<Insight[]> {
+  const model = genAI.getGenerativeModel({ model: FLASH_MODEL });
+  const p = safeProfile(profile);
+  const monthlyTotal = sumCO2(activities).toFixed(1);
+  const topCat = findTopCategory(activities);
+  
+  const prompt = `You are an expert carbon footprint advisor for the EcoTrace app. Analyze this user's data and generate exactly 5 personalized, actionable insights to reduce their carbon footprint.
+
+USER PROFILE:
+- Name: ${p.displayName}
+- Location: ${p.location}
+- Household size: ${p.householdSize} people
+- Car type: ${p.carType}
+- Diet type: ${p.dietType}
+
+CARBON DATA (this month: ${monthlyTotal}kg CO₂, top category: ${topCat}):
+${buildActivitySummary(activities)}
+
+INSTRUCTIONS:
+- Focus on highest-impact, realistic changes for THIS specific user
+- If no activities, give general advice based on profile
+- Make action items specific and measurable
+
+RESPOND ONLY WITH A VALID JSON ARRAY. No markdown fences, no explanation, no extra text.
+Each object must have EXACTLY these fields:
+{
+  "id": "unique-string-1",
+  "title": "Short compelling title (max 60 chars)",
+  "description": "1-2 sentences explaining the impact clearly",
+  "actionItems": ["step 1", "step 2", "step 3"],
+  "category": "transport"|"food"|"energy"|"shopping"|"travel",
+  "potentialSavingKg": 12.5,
+  "difficulty": "easy"|"medium"|"hard",
+  "generatedAt": "${new Date().toISOString()}"
+}`;
+
+  const result = await model.generateContent(prompt);
+  let text = result.response.text().trim();
+  
+  // Strip markdown fences if model ignores instructions
+  text = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+  
+  // Extract JSON array even if there's surrounding text
+  const match = text.match(/\[[\s\S]*\]/);
+  if (!match) throw new Error('No JSON array in response');
+  
+  const parsed = JSON.parse(match[0]);
+  if (!Array.isArray(parsed)) throw new Error('Invalid AI response format');
+  
+  return parsed.slice(0, 5).map((item: any, i: number) => ({
+    id: item.id || `insight-${i}`,
+    title: item.title || 'Carbon Reduction Tip',
+    description: item.description || '',
+    actionItems: Array.isArray(item.actionItems) ? item.actionItems.slice(0, 3) : [],
+    category: item.category || 'transport',
+    potentialSavingKg: Number(item.potentialSavingKg) || 5,
+    difficulty: item.difficulty || 'medium',
+    generatedAt: item.generatedAt || new Date().toISOString(),
+  }));
+}
+
+// ── Deep Analysis ─────────────────────────────────────────────────────────
+export async function generateDeepAnalysis(
+  activities: Activity[],
+  profile: Partial<UserProfile>,
+  question: string
+): Promise<string> {
+  const model = genAI.getGenerativeModel({ model: PRO_MODEL });
+  const p = safeProfile(profile);
+  const monthlyTotal = sumCO2(activities).toFixed(1);
+  const topCat = findTopCategory(activities);
+
+  const systemContext = `You are EcoTrace's expert AI advisor specializing in carbon footprint analysis.
+
+USER: ${p.displayName}, ${p.location}, household of ${p.householdSize}, ${p.dietType} diet, drives ${p.carType}.
+This month: ${monthlyTotal}kg CO₂. Top emission source: ${topCat}. Total logged activities: ${activities.length}.
+
+ACTIVITY DATA:
+${buildActivitySummary(activities)}
+
+Provide a thorough, structured analysis with:
+1. Current Impact Assessment
+2. Top 3 Problem Areas with specific numbers
+3. Comparison to global/regional averages
+4. 5-7 Concrete Action Plan (ranked by impact)
+5. 3-month Projection if actions are taken
+6. Encouraging closing statement
+
+Use markdown formatting with ## headers, bullet points, and **bold** for key figures. Be specific with numbers.`;
+
+  const result = await model.generateContent(`${systemContext}\n\nUser question: ${question}`);
+  return result.response.text();
+}
+
+// ── Streaming Chat ────────────────────────────────────────────────────────
+export async function* streamChatResponse(
+  message: string,
+  history: Array<{role: string; content: string}>,
+  activities: Activity[],
+  profile: Partial<UserProfile>
+): AsyncGenerator<string> {
+  const model = genAI.getGenerativeModel({ model: FLASH_MODEL });
+  const p = safeProfile(profile);
+  const monthlyTotal = sumCO2(activities).toFixed(1);
+  const topCat = findTopCategory(activities);
+
+  const chat = model.startChat({
+    history: history.map(h => ({
+      role: h.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: h.content }],
+    })),
+    systemInstruction: {
+      role: 'system',
+      parts: [{
+        text: `You are EcoTrace AI, a friendly and knowledgeable carbon footprint coach.
+
+User: ${p.displayName}, ${p.location}, ${p.dietType} diet, drives ${p.carType}, household of ${p.householdSize}.
+This month: ${monthlyTotal}kg CO₂. Top source: ${topCat}.
+
+Recent activity data:
+${buildActivitySummary(activities)}
+
+Guidelines:
+- Be encouraging, specific, and practical
+- Use the user's actual data when relevant
+- Give concise responses (2-4 sentences unless they ask for more)
+- Back up suggestions with numbers from their data
+- If they have no data, give personalized advice based on their profile`
+      }]
+    },
+  });
+
+  const stream = await chat.sendMessageStream(message);
+  for await (const chunk of stream.stream) {
+    yield chunk.text();
+  }
+}
+
+// ── Activity Impact Prediction ────────────────────────────────────────────
+export async function predictActivityImpact(
+  activityType: string,
+  quantity: number,
+  userHistory: Activity[]
+): Promise<{ co2Kg: number; comparison: string; tip: string }> {
+  const model = genAI.getGenerativeModel({
+    model: FLASH_MODEL,
+    generationConfig: { responseMimeType: 'application/json' },
+  });
+
+  const avgUserCO2 = userHistory.length > 0
+    ? (userHistory.reduce((s, a) => s + a.co2Kg, 0) / userHistory.length)
+    : 2;
+
+  const prompt = `Carbon footprint tracker prediction.
+Activity: "${activityType}" with quantity ${quantity}.
+User's average activity CO₂: ${avgUserCO2.toFixed(2)}kg.
+
+Return ONLY JSON (no markdown):
+{"co2Kg": <number>, "comparison": "<one sentence vs typical>", "tip": "<one actionable reduction tip>"}`;
+
+  const result = await model.generateContent(prompt);
+  let text = result.response.text().trim();
+  text = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+  
+  try {
+    return JSON.parse(text);
+  } catch {
+    // Fallback
+    return { co2Kg: quantity * 0.1, comparison: 'Similar to average', tip: 'Consider lower-emission alternatives.' };
+  }
 }
