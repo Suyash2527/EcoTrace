@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import { useScrollReveal } from '../../hooks/useScrollReveal';
 import { useCountUp } from '../../hooks/useCountUp';
 
@@ -23,7 +23,6 @@ export function ProgressRing({
   strokeWidth = 12,
   label = 'This Month',
   unit = 'kg CO₂',
-  color = '#16a34a',
 }: ProgressRingProps) {
   const { ref, visible } = useScrollReveal<HTMLDivElement>({ threshold: 0.3 });
   const animatedValue = useCountUp(value, visible, { decimals: 1, duration: 1600, easing: 'easeOut' });

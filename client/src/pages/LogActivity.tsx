@@ -21,7 +21,7 @@ export function LogActivity() {
     setToasts(prev => prev.filter(t => t.id !== id));
   };
 
-  const handleSubmit = async (data: any) => {
+  const handleSubmit = async (data: unknown) => {
     setIsSubmitting(true);
     try {
       const result = await addActivity(data);
@@ -30,7 +30,7 @@ export function LogActivity() {
       } else {
         addToast('Activity logged successfully!', 'success');
       }
-    } catch (err) {
+    } catch {
       addToast('Failed to log activity. Please try again.', 'error');
     } finally {
       setIsSubmitting(false);
@@ -41,7 +41,7 @@ export function LogActivity() {
     try {
       await deleteActivity(id);
       addToast('Activity removed.', 'success');
-    } catch (err) {
+    } catch {
       addToast('Failed to remove activity.', 'error');
     }
   };

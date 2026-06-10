@@ -32,15 +32,10 @@ export function DonutChart({ data }: DonutChartProps) {
   const radius = 80;
   const circumference = 2 * Math.PI * radius;
 
-  const getCoordinatesForPercent = (percent: number) => {
-    const x = Math.cos(2 * Math.PI * percent);
-    const y = Math.sin(2 * Math.PI * percent);
-    return [x, y];
-  };
-
   const segments = Object.entries(data)
-    .filter(([_, value]) => value > 0)
-    .map(([category, value]) => {
+    .filter((entry) => entry[1] > 0)
+    .map((entry) => {
+      const value = entry[1];
       const percent = value / total;
       const strokeDasharray = `${percent * circumference} ${circumference}`;
       const strokeDashoffset = -cumulativePercent * circumference;

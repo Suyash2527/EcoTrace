@@ -95,9 +95,11 @@ export function Landing() {
   const [heroStage, setHeroStage] = useState(0);
 
   useEffect(() => {
+     
     setMounted(true);
     // Stagger hero elements
     const timers = [
+       
       setTimeout(() => setHeroStage(1), 100),
       setTimeout(() => setHeroStage(2), 250),
       setTimeout(() => setHeroStage(3), 450),

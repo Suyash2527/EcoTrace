@@ -35,15 +35,15 @@ export function OnboardingFlow() {
     try {
       await updateProfile({
         ...formData,
-        carType: formData.carType as any,
-        dietType: formData.dietType as any,
+        carType: formData.carType,
+        dietType: formData.dietType,
         onboardingComplete: true,
         createdAt: new Date().toISOString(),
         totalCO2Kg: 0
       });
       announce('Profile completed successfully');
       navigate('/dashboard');
-    } catch (err) {
+    } catch {
       announce('Failed to save profile');
     } finally {
       setLoading(false);

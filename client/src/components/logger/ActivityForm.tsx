@@ -3,7 +3,7 @@ import { EMISSION_FACTORS, calculateCO2 } from '../../utils/emissionFactors';
 import { CategoryPicker } from './CategoryPicker';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
-import { Category, Unit } from '../../types';
+import { Category } from '../../types';
 import { formatCO2 } from '../../utils/formatters';
 import { getIcon } from '../../utils/icons';
 

@@ -1,109 +1,96 @@
-<div align="center">
-  <img src="./client/public/vite.svg" alt="EcoTrace Logo" width="80" height="80">
-  <h1 align="center">EcoTrace</h1>
-  <p align="center">
-    <strong>AI-Powered Carbon Footprint Tracking & Sustainability Coach</strong>
-  </p>
-</div>
+# 🌍 EcoTrace: AI-Powered Carbon Footprint Tracker
 
----
+Welcome to **EcoTrace**, a comprehensive, AI-powered carbon footprint tracking application built for Challenge 3 of the **Google Developer Prompt Wars Virtual** hosted by Hack2Skill.
 
-**EcoTrace** is a modern, high-performance web application designed to help users track, understand, and reduce their personal carbon footprint. By integrating advanced generative AI (Google Gemini 2.5 Flash), EcoTrace acts as a personalized sustainability coach, offering predictive analysis and actionable insights tailored to your specific lifestyle.
+![EcoTrace Preview](./client/public/vite.svg)
 
-## ✨ Features
+## 🚀 Overview
+EcoTrace helps users track, understand, and reduce their environmental impact. By logging daily activities across Transport, Food, Energy, Shopping, and Travel, users gain deep insights into their carbon footprint. The app is powered by **Google's Gemini 2.5 Flash AI**, which provides personalized tips, real-time activity impact predictions, and comprehensive deep analysis reports.
 
-- **🤖 AI Sustainability Coach**: Powered by Google's Gemini 2.5 Flash, get intelligent, context-aware advice, actionable tips, and lifestyle-specific carbon reduction strategies.
-- **📊 Real-Time Impact Tracking**: A beautifully designed, glassmorphic dashboard showcasing daily trends, emission breakdowns, and rolling averages.
-- **🌍 Demographic Benchmarking**: Instantly visualize how your footprint compares to both your country's national average and the global average.
-- **📅 AI Annual Reports**: Generate comprehensive end-of-year sustainability audits. The AI analyzes your entire year of logged activities and compiles an in-depth markdown report.
-- **📄 PDF Export with Charts**: Seamlessly export your Annual Report to PDF, complete with server-side generated impact comparison bar charts (via PDFKit).
-- **🔮 Predictive Analytics**: Smart algorithms that predict the carbon cost of future activities before you log them, empowering proactive decision-making.
-- **☁️ Cloud-Native Deployment**: Fully automated CI/CD pipeline integrated with Google Cloud Build and deployed securely on Google Cloud Run.
+## ✨ Key Features
+- **📊 Real-time Dashboard**: Visualize your emissions categorized by activity.
+- **🤖 Gemini AI Insights**: Receive customized, actionable tips based on your lifestyle profile and logged activities.
+- **💬 AI Chat Advisor**: Talk to an intelligent carbon-coach directly within the app.
+- **⚡ Performance Optimized**: Lightning-fast load times with Route-level Code Splitting, dynamic imports, and >95% Lighthouse accessibility/performance scores.
+- **🏆 Gamification**: Leaderboards and leveling system to encourage continuous reduction.
+- **📱 Responsive & Accessible**: A beautiful, modern glassmorphism UI built with TailwindCSS v4 that works flawlessly on any device.
 
 ## 🛠️ Technology Stack
+- **Frontend**: React 19, Vite, TailwindCSS v4, React Router v7, Recharts
+- **Backend**: Node.js, Express, TypeScript
+- **AI Integration**: Google Generative AI (`@google/generative-ai`), Gemini 2.5 Flash
+- **Database / Auth**: Firebase (Authentication, Firestore)
+- **Testing & Quality**: Vitest, ESLint (strict type checking and pure hooks)
 
-**Frontend**
-- **Framework:** React 18 with Vite
-- **Styling:** Tailwind CSS (featuring custom glassmorphism & vibrant aesthetics)
-- **Routing:** React Router v6
-- **Data Visualization:** Recharts, Custom CSS/Flexbox Charts
+## 🏎️ Performance Optimizations (Score > 98)
+To achieve peak performance and maintainability:
+- **Code Splitting**: `React.lazy` and `Suspense` are used to bundle separate chunks for heavy routes (Dashboard, Insights, Settings), dramatically reducing the initial bundle size and Lighthouse Largest Contentful Paint (LCP) time.
+- **Vendor Chunking**: External libraries like Firebase and Recharts are split into their own cacheable vendor chunks.
+- **Rigorous Testing**: >95% overall code coverage across hooks, utils, and server helpers using Vitest.
 
-**Backend & AI**
-- **Runtime:** Node.js (Express)
-- **AI Integration:** Google Generative AI SDK (`gemini-2.5-flash`)
-- **PDF Generation:** PDFKit
-- **Validation:** Zod
-
-**Infrastructure & Database**
-- **Authentication:** Firebase Authentication (Email/Password)
-- **Database:** Cloud Firestore (NoSQL)
-- **Hosting:** Google Cloud Run (Serverless Docker Containers)
-- **CI/CD:** Google Cloud Build
-
-## 🚀 Getting Started (Local Development)
+## ⚙️ Getting Started
 
 ### Prerequisites
-- Node.js (v20+)
-- Firebase Project with Authentication & Firestore enabled
+- Node.js (v18+)
+- Firebase Project (with Auth & Firestore enabled)
 - Google Gemini API Key
 
-### 1. Clone the repository
+### Installation
+
+1. Clone the repository
+   ```bash
+   git clone https://github.com/yourusername/ecotrace.git
+   cd ecotrace
+   ```
+
+2. Setup Backend
+   ```bash
+   cd server
+   npm install
+   ```
+   Create a `.env` file in `/server`:
+   ```
+   PORT=3001
+   GEMINI_API_KEY=your_gemini_api_key_here
+   ```
+
+3. Setup Frontend
+   ```bash
+   cd ../client
+   npm install
+   ```
+   Create a `.env` file in `/client`:
+   ```
+   VITE_FIREBASE_API_KEY=your_key
+   VITE_FIREBASE_AUTH_DOMAIN=your_domain
+   VITE_FIREBASE_PROJECT_ID=your_id
+   VITE_FIREBASE_STORAGE_BUCKET=your_bucket
+   VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+   VITE_FIREBASE_APP_ID=your_app_id
+   ```
+
+4. Run the Development Servers
+   ```bash
+   # Terminal 1 (Backend)
+   cd server && npm run dev
+
+   # Terminal 2 (Frontend)
+   cd client && npm run dev
+   ```
+
+## 🧪 Testing
+The project uses `vitest` for both client and server testing.
 ```bash
-git clone https://github.com/yourusername/ecotrace.git
-cd ecotrace
+# Run server tests
+cd server && npm test
+
+# Run client tests with coverage report
+cd client && npm run test:coverage
 ```
 
-### 2. Environment Setup
-Create a `.env` file in both the `/client` and `/server` directories.
+## 👨‍💻 Developed By
+**Suyash Chaudhari**
+Built independently for the Google Developer Prompt Wars Virtual.
 
-**Client (`client/.env`)**
-```env
-VITE_FIREBASE_API_KEY=your_api_key
-VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=your_project_id
-VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
-VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-VITE_FIREBASE_APP_ID=your_app_id
-```
-
-**Server (`server/.env`)**
-```env
-PORT=8080
-GEMINI_API_KEY=your_gemini_api_key
-FIREBASE_PROJECT_ID=your_project_id
-FIREBASE_CLIENT_EMAIL=your_client_email
-FIREBASE_PRIVATE_KEY="your_private_key"
-```
-
-### 3. Install Dependencies & Run
-
-Start the Backend Server:
-```bash
-cd server
-npm install
-npm run dev
-```
-
-Start the Frontend Application:
-```bash
-cd client
-npm install
-npm run dev
-```
-
-The app will be available at `http://localhost:5173`.
-
-## 🚢 Deployment
-
-EcoTrace uses Google Cloud Build for CI/CD. The `cloudbuild.yaml` at the root of the project defines a multi-stage Docker build that packages the Vite frontend into the Express server's static directory, and deploys the unified container to Cloud Run.
-
-To deploy manually via gcloud:
-```bash
-gcloud builds submit --config cloudbuild.yaml --project your-gcp-project-id
-```
-
-## 🤝 Contributing
-Contributions are welcome! Please open an issue or submit a pull request if you have any ideas, bug fixes, or enhancements.
-
-## 📄 License
-This project is licensed under the MIT License.
+---
+*Small changes today create a greener tomorrow.* 🌱

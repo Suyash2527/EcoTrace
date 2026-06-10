@@ -20,8 +20,9 @@ describe('emissionFactors.ts', () => {
     expect(calculateCO2('shopping', 'laptop', 1)).toBe(400);
   });
 
-  it('returns 0 for unknown type', () => {
+  it('returns 0 for unknown type or category', () => {
     expect(calculateCO2('transport', 'unknown_type', 10)).toBe(0);
+    expect(calculateCO2('unknown_category' as import('../../types').Category, 'laptop', 10)).toBe(0);
   });
 
   it('handles negative or zero quantities', () => {

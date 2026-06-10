@@ -46,13 +46,13 @@ function safeProfile(profile: Partial<UserProfile>) {
   };
 }
 
-function findTopCategory(activities: Activity[]): string {
+export function findTopCategory(activities: Activity[]): string {
   const totals: Record<string, number> = {};
   activities.forEach(a => { totals[a.category] = (totals[a.category] ?? 0) + a.co2Kg; });
   return Object.entries(totals).sort((a, b) => b[1] - a[1])[0]?.[0] ?? 'transport';
 }
 
-function sumCO2(activities: Activity[]): number {
+export function sumCO2(activities: Activity[]): number {
   const now = new Date();
   const monthAgo = new Date(now); monthAgo.setMonth(now.getMonth() - 1);
   return activities
@@ -60,7 +60,7 @@ function sumCO2(activities: Activity[]): number {
     .reduce((s, a) => s + a.co2Kg, 0);
 }
 
-function buildActivitySummary(activities: Activity[]): string {
+export function buildActivitySummary(activities: Activity[]): string {
   if (activities.length === 0) return 'No activities logged yet.';
   
   // Group by category and sum

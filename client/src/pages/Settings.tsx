@@ -1,8 +1,5 @@
 import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
-import { Card } from '../components/ui/Card';
 import { Toast } from '../components/ui/Toast';
 
 export function Settings() {
@@ -18,7 +15,9 @@ export function Settings() {
     dietType: profile?.dietType || 'omnivore'
   });
 
-  React.useEffect(() => {
+  const [prevProfile, setPrevProfile] = useState(profile);
+  if (profile !== prevProfile) {
+    setPrevProfile(profile);
     if (profile) {
       setFormData({
         displayName: profile.displayName || '',
@@ -28,7 +27,7 @@ export function Settings() {
         dietType: profile.dietType || 'omnivore'
       });
     }
-  }, [profile]);
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const value = e.target.type === 'number' ? parseInt(e.target.value) || 1 : e.target.value;
@@ -40,12 +39,12 @@ export function Settings() {
     try {
       await updateProfile({
         ...formData,
-        carType: formData.carType as any,
-        dietType: formData.dietType as any,
+        carType: formData.carType as 'none' | 'electric' | 'hybrid' | 'petrol' | 'diesel',
+        dietType: formData.dietType as 'vegan' | 'vegetarian' | 'omnivore' | 'heavy-meat',
         onboardingComplete: true
       });
       setToast({ message: 'Profile updated successfully', type: 'success' });
-    } catch (err) {
+    } catch {
       setToast({ message: 'Failed to update profile', type: 'error' });
     } finally {
       setLoading(false);

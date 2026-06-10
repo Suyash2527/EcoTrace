@@ -30,7 +30,7 @@ export function CategoryBreakdown({ data }: CategoryBreakdownProps) {
   // Sort descending
   const sorted = Object.entries(data)
     .sort((a, b) => b[1] - a[1])
-    .filter(([_, val]) => val > 0);
+    .filter((entry) => entry[1] > 0);
 
   if (total === 0) {
     return (

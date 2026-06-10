@@ -60,13 +60,14 @@ export function Insights() {
 
       const data = await response.json();
       setInsights(data);
-    } catch (err: any) {
-      setError(err.message || 'Something went wrong');
+    } catch {
+      setError('Something went wrong');
     } finally {
       setLoading(false);
     }
   };
 
+   
   useEffect(() => {
     if (user) fetchInsights();
   }, [user, profile?.uid]);

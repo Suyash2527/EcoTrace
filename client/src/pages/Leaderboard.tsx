@@ -148,11 +148,6 @@ export function Leaderboard() {
 
   const { ref: headerRef, visible: headerVisible } = useScrollReveal<HTMLDivElement>({ threshold: 0.1 });
 
-  useEffect(() => {
-    if (!user) return;
-    fetchLeaderboard();
-  }, [user]);
-
   const fetchLeaderboard = async () => {
     if (!user) return;
     setLoading(true);
@@ -179,8 +174,8 @@ export function Leaderboard() {
       } else {
         setEntries(data.map(e => ({ ...e, isCurrentUser: e.uid === user.uid })));
       }
-    } catch (err: any) {
-      setError(err.message);
+    } catch {
+      setError('Failed to load leaderboard');
       // Fallback: show current user at least
       if (profile) {
         setEntries([{
@@ -196,12 +191,16 @@ export function Leaderboard() {
     }
   };
 
+   
+  useEffect(() => {
+    if (!user) return;
+    fetchLeaderboard();
+  }, [user]);
+
   const top3 = entries.slice(0, 3);
   const rest = entries.slice(3);
 
-  // Sort podium: 2nd, 1st, 3rd for visual layout
-  const podiumOrder = [top3[1], top3[0], top3[2]].filter(Boolean);
-  const podiumHeightClass = ['', 'self-end', ''];
+
 
   return (
     <div className="p-5 md:p-10 max-w-3xl mx-auto space-y-6">
